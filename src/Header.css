@@ -1,6 +1,33 @@
 .Header{
-    text-align: center;
-    color: blue;
+    text-align: left;
+    color: #3977cb;
     font-family: 'Fira Sans Extra Condensed', sans-serif;
+    background-color: #f0f2f5;
+    padding: 2px;
+    display: flex;
 }
 
+h1 {
+    text-align: left;
+    margin-top: 25px;
+}
+
+.Navbar ul {
+    list-style-type: none;
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    margin-left: 15px;
+}
+
+.Navbar li {
+    display: inline;
+}
+
+img {
+    width: 50px;
+    height: 50px;
+    margin-top: 15px;
+    margin-right: 15px;
+    margin-left: 15px;
+}
