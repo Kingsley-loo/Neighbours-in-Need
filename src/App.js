@@ -1,11 +1,12 @@
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
+import ServiceSearch from './components/ServiceSearch';
 
 function App() {
   return (
     <div className="App">
-      
-      <h1>Hello</h1>
+      <h1>Community Service Finder</h1>
+      <ServiceSearch />
     </div>
   );
 }
