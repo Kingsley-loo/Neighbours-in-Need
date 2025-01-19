@@ -39,4 +39,15 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Add this POST route
+router.post('/', async (req, res) => {
+  try {
+    const newService = new Service(req.body);
+    const savedService = await newService.save();
+    res.status(201).json(savedService);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 module.exports = router;

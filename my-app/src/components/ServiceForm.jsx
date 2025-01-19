@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 
-const ServiceForm = ({ onSubmit }) => {
+const ServiceForm = () => {
   const [formData, setFormData] = useState({
     name: '',
     category: '',
@@ -10,30 +10,34 @@ const ServiceForm = ({ onSubmit }) => {
     postalCode: '',
     locationCoordinates: {
       type: 'Point',
-      coordinates: [0, 0]
+      coordinates: [-123.2460, 49.2606] // UBC coordinates
     }
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleDescriptionChange = (content) => {
-    setFormData(prev => ({
-      ...prev,
-      description: content
-    }));
-  };
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+
     try {
-      await onSubmit(formData);
-      // Reset form
+      const response = await fetch('http://localhost:5001/services', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add service');
+      }
+
+      setSuccess(true);
       setFormData({
         name: '',
         category: '',
@@ -42,110 +46,132 @@ const ServiceForm = ({ onSubmit }) => {
         postalCode: '',
         locationCoordinates: {
           type: 'Point',
-          coordinates: [0, 0]
+          coordinates: [-79.3832, 43.6532]
         }
       });
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error('Error adding service:', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Service Name
-        </label>
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          required
-        />
-      </div>
+    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-6">Add New Service</h2>
+      
+      {success && (
+        <div className="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700">
+          Service added successfully!
+        </div>
+      )}
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Category
-        </label>
-        <select
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          required
-        >
-          <option value="">Select a category</option>
-          <option value="Food Banks">Food Banks</option>
-          <option value="Shelters">Shelters</option>
-          <option value="Legal Aid">Legal Aid</option>
-        </select>
-      </div>
+      {error && (
+        <div className="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
+          {error}
+        </div>
+      )}
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Address
-        </label>
-        <input
-          type="text"
-          name="address"
-          value={formData.address}
-          onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          required
-        />
-      </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Service Name
+          </label>
+          <input
+            type="text"
+            value={formData.name}
+            onChange={(e) => setFormData({...formData, name: e.target.value})}
+            className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            required
+            placeholder="Enter service name"
+          />
+        </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Postal Code
-        </label>
-        <input
-          type="text"
-          name="postalCode"
-          value={formData.postalCode}
-          onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          required
-        />
-      </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Category
+          </label>
+          <select
+            value={formData.category}
+            onChange={(e) => setFormData({...formData, category: e.target.value})}
+            className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            required
+          >
+            <option value="">Select Category</option>
+            <option value="Food Banks">Food Banks</option>
+            <option value="Shelters">Shelters</option>
+            <option value="Legal Aid">Legal Aid</option>
+          </select>
+        </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Description
-        </label>
-        <Editor
-          apiKey="your-tiny-mce-api-key"
-          init={{
-            height: 300,
-            menubar: false,
-            plugins: [
-              'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
-              'preview', 'anchor', 'searchreplace', 'visualblocks', 'code',
-              'fullscreen', 'insertdatetime', 'media', 'table', 'code', 'help',
-              'wordcount'
-            ],
-            toolbar: 'undo redo | blocks | ' +
-              'bold italic forecolor | alignleft aligncenter ' +
-              'alignright alignjustify | bullist numlist outdent indent | ' +
-              'removeformat | help'
-          }}
-          value={formData.description}
-          onEditorChange={handleDescriptionChange}
-        />
-      </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Address
+          </label>
+          <input
+            type="text"
+            value={formData.address}
+            onChange={(e) => setFormData({...formData, address: e.target.value})}
+            className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            required
+            placeholder="Enter full address"
+          />
+        </div>
 
-      <div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Postal Code
+          </label>
+          <input
+            type="text"
+            value={formData.postalCode}
+            onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
+            className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            required
+            placeholder="Enter postal code"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Description
+          </label>
+          <Editor
+            apiKey="70u2lngv8ojlrncak4zniddsuhauj9cf69mnnwuqwmggxc2c"
+            initialValue=""
+            init={{
+              height: 300,
+              menubar: false,
+              plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
+                'preview', 'anchor', 'searchreplace', 'visualblocks',
+                'fullscreen', 'insertdatetime', 'media', 'table', 'help',
+                'wordcount'
+              ],
+              toolbar: 'undo redo | formatselect | ' +
+                'bold italic backcolor | alignleft aligncenter ' +
+                'alignright alignjustify | bullist numlist outdent indent | ' +
+                'removeformat | help',
+              content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+              branding: false,
+              promotion: false
+            }}
+            onEditorChange={(content) => setFormData(prev => ({...prev, description: content}))}
+          />
+        </div>
+
         <button
           type="submit"
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          disabled={loading}
+          className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
+            ${loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}
+            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
         >
-          Add Service
+          {loading ? 'Adding Service...' : 'Add Service'}
         </button>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 
