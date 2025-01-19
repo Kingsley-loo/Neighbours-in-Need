@@ -1,0 +1,35 @@
+.App {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.service-search {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+button:disabled {
+  background-color: gray;
+}
+
+.error {
+  color: red;
+}
+
+ul {
+  list-style-type: none;
+}
+
+li {
+  margin-bottom: 15px;
+}
