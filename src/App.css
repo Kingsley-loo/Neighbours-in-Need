@@ -1,10 +1,13 @@
 .App {
-  font-family: Arial, sans-serif;
-  padding: 20px;
+  font-family: 'Fira Sans Extra Condensed', sans-serif;
+  padding: 0px;
+  
 }
 
 h1 {
   text-align: center;
+  font-family: 'Fira Sans Extra Condensed', sans-serif;
+  margin-left: 25px;
 }
 
 .service-search {
@@ -12,11 +15,25 @@ h1 {
   margin: 0 auto;
 }
 
-input, select, button {
+input{
+  width: 50%;
+  align-items: left;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+select {
   width: 100%;
   padding: 10px;
   margin: 10px 0;
 }
+
+button {  
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
 
 button:disabled {
   background-color: gray;
