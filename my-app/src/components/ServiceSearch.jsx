@@ -3,10 +3,10 @@ import { fetchServices } from '../services/fetchServices';
 import ServiceList from './ServiceList';
 import ServiceMap from './ServiceMap';
 
-const ServiceSearch = () => {
+const ServiceSearch = ({ services }) => {
   const [postalCode, setPostalCode] = useState('');
   const [category, setCategory] = useState('');
-  const [services, setServices] = useState([]);
+  const [filteredServices, setFilteredServices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [view, setView] = useState('list');
@@ -18,7 +18,7 @@ const ServiceSearch = () => {
         const response = await fetch('http://localhost:5001/services/all');
         const data = await response.json();
         console.log('Initial services:', data);
-        setServices(data);
+        setFilteredServices(data);
       } catch (err) {
         console.error('Error fetching initial services:', err);
         setError('Failed to load services');
@@ -36,7 +36,7 @@ const ServiceSearch = () => {
       console.log('Searching with:', { postalCode, category });
       const data = await fetchServices(postalCode, category);
       console.log('Search results:', data);
-      setServices(data);
+      setFilteredServices(data);
     } catch (err) {
       console.error('Search error:', err);
       setError('Failed to fetch services');
@@ -119,9 +119,9 @@ const ServiceSearch = () => {
 
       <div className="bg-white rounded-lg shadow-md">
         {view === 'list' ? (
-          <ServiceList services={services} />
+          <ServiceList services={filteredServices} />
         ) : (
-          <ServiceMap services={services} />
+          <ServiceMap services={filteredServices} />
         )}
       </div>
     </div>

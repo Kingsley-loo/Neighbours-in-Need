@@ -42,11 +42,19 @@ router.get('/', async (req, res) => {
 // Add this POST route
 router.post('/', async (req, res) => {
   try {
-    const newService = new Service(req.body);
-    const savedService = await newService.save();
-    res.status(201).json(savedService);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+    const serviceData = {
+      ...req.body,
+      locationCoordinates: {
+        type: 'Point',
+        coordinates: req.body.locationCoordinates?.coordinates || [-123.2460, 49.2606]
+      }
+    };
+    
+    const service = new Service(serviceData);
+    await service.save();
+    res.status(201).json(service);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 });
 

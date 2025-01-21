@@ -12,6 +12,13 @@ function App() {
   const [services, setServices] = useState([]);
 
   useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
     const fetchServices = async () => {
       try {
         const response = await fetch('http://localhost:5001/services');

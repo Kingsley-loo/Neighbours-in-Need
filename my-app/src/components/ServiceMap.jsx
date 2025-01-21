@@ -44,6 +44,10 @@ const ServiceMap = ({ services = [] }) => {
                 <h3 className="font-bold">{service.name}</h3>
                 <p className="text-gray-600">{service.category}</p>
                 <p className="text-sm">{service.address}</p>
+                <div 
+                  className="mt-2"
+                  dangerouslySetInnerHTML={{ __html: service.description }}
+                />
               </div>
             </Popup>
           </Marker>

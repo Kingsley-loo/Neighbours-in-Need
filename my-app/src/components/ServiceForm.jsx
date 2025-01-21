@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 
-const ServiceForm = () => {
+const ServiceForm = ({ editMode = false, serviceData = null }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    category: '',
-    address: '',
-    description: '',
+    name: editMode ? serviceData.name : '',
+    category: editMode ? serviceData.category : '',
+    address: editMode ? serviceData.address : '',
+    description: editMode ? serviceData.description : '',
     postalCode: '',
     locationCoordinates: {
       type: 'Point',
@@ -17,6 +17,7 @@ const ServiceForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [editorRef, setEditorRef] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,12 +26,18 @@ const ServiceForm = () => {
     setSuccess(false);
 
     try {
+      const dataToSubmit = {
+        ...formData,
+        locationCoordinates: {
+          type: 'Point',
+          coordinates: [-123.2460, 49.2606] // UBC coordinates
+        }
+      };
+
       const response = await fetch('http://localhost:5001/services', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dataToSubmit),
       });
 
       if (!response.ok) {
@@ -46,11 +53,15 @@ const ServiceForm = () => {
         postalCode: '',
         locationCoordinates: {
           type: 'Point',
-          coordinates: [-79.3832, 43.6532]
+          coordinates: [-123.2460, 49.2606]
         }
       });
+
+      if (editorRef) {
+        editorRef.setContent('');
+      }
     } catch (error) {
-      console.error('Error adding service:', error);
+      console.error('Error:', error);
       setError(error.message);
     } finally {
       setLoading(false);
@@ -139,6 +150,7 @@ const ServiceForm = () => {
           </label>
           <Editor
             apiKey="70u2lngv8ojlrncak4zniddsuhauj9cf69mnnwuqwmggxc2c"
+            onInit={(evt, editor) => setEditorRef(editor)}
             initialValue=""
             init={{
               height: 300,

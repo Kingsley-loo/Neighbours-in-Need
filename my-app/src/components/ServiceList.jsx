@@ -16,8 +16,11 @@ const ServiceList = ({ services }) => {
             </div>
             <span className="text-sm text-gray-500">{service.postalCode}</span>
           </div>
-          <p className="mt-2 text-sm text-gray-500">{service.description}</p>
           <p className="mt-2 text-sm text-gray-500">{service.address}</p>
+          <div 
+            className="mt-2 text-gray-700 prose"
+            dangerouslySetInnerHTML={{ __html: service.description }}
+          />
         </div>
       ))}
     </div>
